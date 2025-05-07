@@ -9,6 +9,8 @@ import Modelo.Controller;
 import Modelo.Tutor;
 import Modelo.Tutorado;
 import java.util.List;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -21,7 +23,7 @@ public class ITutor extends javax.swing.JFrame {
     /**
      * Creates new form ITutor
      */
-    private Tutorado tutorado;
+    private Tutor tutor;
     private Controller control;
     private List<Tutor> tutores;
     private MTtutor mTutor;
@@ -33,6 +35,8 @@ public class ITutor extends javax.swing.JFrame {
     mTutor = new MTtutor(tutores);
     tbTutores.setModel(mTutor);
     
+    String[] carreras= {"Ingenieria en sistemas","Administracion","Quimica"};
+    cmbCarrera.setModel(new DefaultComboBoxModel<>(carreras));
  
 
     // Forzar renderizado correcto
@@ -63,9 +67,9 @@ public class ITutor extends javax.swing.JFrame {
         btnRegistrar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbTutores = new javax.swing.JTable();
-        jSpinner1 = new javax.swing.JSpinner();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jpNoTarjeta = new javax.swing.JSpinner();
+        cmbCarrera = new javax.swing.JComboBox<>();
+        jfNombre = new javax.swing.JFormattedTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -98,11 +102,11 @@ public class ITutor extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tbTutores);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbCarrera.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jFormattedTextField1.addActionListener(new java.awt.event.ActionListener() {
+        jfNombre.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextField1ActionPerformed(evt);
+                jfNombreActionPerformed(evt);
             }
         });
 
@@ -123,9 +127,9 @@ public class ITutor extends javax.swing.JFrame {
                             .addComponent(lbNombre))
                         .addGap(23, 23, 23)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jFormattedTextField1)
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jfNombre)
+                            .addComponent(jpNoTarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbCarrera, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(136, 136, 136)
                         .addComponent(lbTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -142,15 +146,15 @@ public class ITutor extends javax.swing.JFrame {
                 .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lbTarjeta)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jpNoTarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbNombre))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lbCarrera)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbCarrera, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(47, 47, 47)
                 .addComponent(btnRegistrar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
@@ -162,12 +166,23 @@ public class ITutor extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-        // TODO add your handling code here:
+       
+        tutor= new Tutor();
+     
+        tutor.setNombre(jfNombre.getText());
+        tutor.setCarrera((String) cmbCarrera.getSelectedItem());
+        tutor.setNumTarjeta((Integer)jpNoTarjeta.getValue());
+        control.crearTutor(tutor);
+        
+         tutores.add(tutor);
+        
+        
+        mTutor.fireTableDataChanged();
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
-    private void jFormattedTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextField1ActionPerformed
+    private void jfNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jfNombreActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jFormattedTextField1ActionPerformed
+    }//GEN-LAST:event_jfNombreActionPerformed
 
     /**
      * @param args the command line arguments
@@ -200,10 +215,10 @@ public class ITutor extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRegistrar;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JComboBox<String> cmbCarrera;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSpinner jSpinner1;
+    private javax.swing.JFormattedTextField jfNombre;
+    private javax.swing.JSpinner jpNoTarjeta;
     private javax.swing.JLabel lbCarrera;
     private javax.swing.JLabel lbNombre;
     private javax.swing.JLabel lbTarjeta;

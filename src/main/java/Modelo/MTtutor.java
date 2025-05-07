@@ -31,6 +31,11 @@ public class MTtutor extends AbstractTableModel{
            return encabezado.length;
        return 0;
     }   
+    
+    @Override
+    public String getColumnName(int c){
+        return encabezado[c];
+    }
 
     @Override
     public Object getValueAt(int row, int column) {

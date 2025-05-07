@@ -28,7 +28,7 @@ public class TutoresPrueba4 {
         control.editarTutorado(tutorado);
         //control.eliminarTutorado("20031");
         */
-        
+        /*
         Tutorado tutorado = control.traerTutorado("2216099");
         System.out.println(tutorado.toString());
         
@@ -37,7 +37,15 @@ public class TutoresPrueba4 {
         for(Tutorado t: lisTutorado){
             System.out.println(t.toString());
         }
+        */
         
+  
+        Tutor t2= new Tutor();
+        t2.setIdTutor(1234);
+        t2.setNombre("Santiago lopez");
+        t2.setCarrera("Fantasma");
+        t2.setNumTarjeta(1234);
+        control.crearTutor(t2);
         
         
         
