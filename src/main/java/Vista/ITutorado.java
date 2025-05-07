@@ -7,9 +7,14 @@ package Vista;
 import Modelo.Controller;
 import Modelo.Tutor;
 import Modelo.Tutorado;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import javax.swing.UIManager;
@@ -28,6 +33,10 @@ public class ITutorado extends javax.swing.JFrame {
     private DefaultListModel modelEst;
     private DefaultListModel modelTutorados;
     
+    private Map<String, Tutorado> tutoradoMap=new HashMap<>();
+    private final String SELECCIONA= "Selecciona tutor";
+    private final String SELECCIONADO= "Tutor seleccionado";
+    
     
     /**
      * Creates new form ITutorado
@@ -44,6 +53,7 @@ public class ITutorado extends javax.swing.JFrame {
         listEst.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         listTutorados.setModel(modelTutorados);
         
+        btnAñadirTutorado.setEnabled(false);
     pack();
     setLocationRelativeTo(null);
     }
@@ -64,8 +74,10 @@ public class ITutorado extends javax.swing.JFrame {
         modelEst.clear();
         
         for(Tutorado t: tutorados){
-            if(t.getTutorId()==null)
+            if(t.getTutorId()==null){
                 modelEst.addElement(t.getNombre());
+                tutoradoMap.put(t.getNombre(), t);
+            }
         }
     }
     /**
@@ -92,7 +104,7 @@ public class ITutorado extends javax.swing.JFrame {
         btnAceptar = new javax.swing.JButton();
         lblSelecciona1 = new javax.swing.JLabel();
         lblSelecciona2 = new javax.swing.JLabel();
-        btnAñadirTutorado1 = new javax.swing.JButton();
+        btnAñadir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -159,10 +171,10 @@ public class ITutorado extends javax.swing.JFrame {
 
         lblSelecciona2.setText("Tutorados:");
 
-        btnAñadirTutorado1.setText("Aceptar tutor");
-        btnAñadirTutorado1.addActionListener(new java.awt.event.ActionListener() {
+        btnAñadir.setText("Aceptar tutor");
+        btnAñadir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAñadirTutorado1ActionPerformed(evt);
+                btnAñadirActionPerformed(evt);
             }
         });
 
@@ -191,7 +203,7 @@ public class ITutorado extends javax.swing.JFrame {
                         .addGap(69, 69, 69))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnAñadirTutorado1, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnAñadir, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(lbSeleccionaTutor, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -208,7 +220,7 @@ public class ITutorado extends javax.swing.JFrame {
                     .addComponent(lbSeleccionaTutor)
                     .addComponent(cmbTutor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(btnAñadirTutorado1)
+                .addComponent(btnAñadir)
                 .addGap(34, 34, 34)
                 .addComponent(lblSelecciona)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -263,12 +275,35 @@ public class ITutorado extends javax.swing.JFrame {
     }//GEN-LAST:event_btnQuitarTutoradoActionPerformed
 
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
-        // TODO add your handling code here:
+        for(int i=0; i<modelTutorados.size();i++){
+            String nombre= (String)modelTutorados.get(i);
+            Tutorado t = tutoradoMap.get(nombre);
+            if(t!=null){
+                t.setTutorId(tutor);
+                try {
+                    control.editarTutorado(t);
+                } catch (Exception ex) {
+                    Logger.getLogger(ITutorado.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }//GEN-LAST:event_btnAceptarActionPerformed
 
-    private void btnAñadirTutorado1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAñadirTutorado1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnAñadirTutorado1ActionPerformed
+    private void btnAñadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAñadirActionPerformed
+        if(cmbTutor.getSelectedItem().equals(SELECCIONA))
+            JOptionPane.showMessageDialog(this,"Selecciona un tutor");
+        else
+            if(JOptionPane.showConfirmDialog(this, "Seleccionaste al tutor"+cmbTutor.getSelectedItem()+"?")==0){
+                tutor= tutores.get(cmbTutor.getSelectedIndex()-1);
+                cmbTutor.setEnabled(false);
+                btnAñadir.setText(SELECCIONADO);
+                btnAñadir.setEnabled(false);
+                
+                if(!modelEst.isEmpty()){
+                    btnAñadirTutorado.setEnabled(true);
+                }
+            }
+    }//GEN-LAST:event_btnAñadirActionPerformed
 
     private void btnAñadirTutoradoActionPerformed1(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAñadirTutoradoActionPerformed1
         
@@ -308,8 +343,8 @@ public class ITutorado extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAceptar;
+    private javax.swing.JButton btnAñadir;
     private javax.swing.JButton btnAñadirTutorado;
-    private javax.swing.JButton btnAñadirTutorado1;
     private javax.swing.JButton btnQuitarTutorado;
     private javax.swing.JComboBox<String> cmbTutor;
     private javax.swing.JPanel jPanel1;
