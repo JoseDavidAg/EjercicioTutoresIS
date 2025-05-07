@@ -10,6 +10,8 @@ import Modelo.Tutorado;
 import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.ListSelectionModel;
+import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import javax.swing.UIManager;
 
 /**
@@ -38,8 +40,9 @@ public class ITutorado extends javax.swing.JFrame {
         cargarTutores();
         cargarEstudiantes();
         
-        
-        
+        listEst.setModel(modelEst);
+        listEst.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        listTutorados.setModel(modelTutorados);
         
     pack();
     setLocationRelativeTo(null);
@@ -131,6 +134,8 @@ public class ITutorado extends javax.swing.JFrame {
         btnAñadirTutorado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAñadirTutoradoActionPerformed(evt);
+                btnAñadirTutoradoActionPerformed1(evt);
+                btnAñadirTutoradoActionPerformed2(evt);
             }
         });
 
@@ -242,7 +247,7 @@ public class ITutorado extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1)
                 .addContainerGap())
         );
 
@@ -264,6 +269,19 @@ public class ITutorado extends javax.swing.JFrame {
     private void btnAñadirTutorado1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAñadirTutorado1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnAñadirTutorado1ActionPerformed
+
+    private void btnAñadirTutoradoActionPerformed1(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAñadirTutoradoActionPerformed1
+        
+        
+    }//GEN-LAST:event_btnAñadirTutoradoActionPerformed1
+
+    private void btnAñadirTutoradoActionPerformed2(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAñadirTutoradoActionPerformed2
+        int[] indEstSelect= listEst.getSelectedIndices();
+        for(int i= indEstSelect.length-1; i>=0; i--){
+            modelTutorados.addElement(modelEst.get(indEstSelect[i]));
+            modelEst.remove(indEstSelect[i]);
+        }
+    }//GEN-LAST:event_btnAñadirTutoradoActionPerformed2
 
     /**
      * @param args the command line arguments
