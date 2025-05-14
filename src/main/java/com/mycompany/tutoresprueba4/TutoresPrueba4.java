@@ -5,9 +5,9 @@
 package com.mycompany.tutoresprueba4;
 
 
-import Modelo.Controller;
-import Modelo.Tutor;
-import Modelo.Tutorado;
+import Model.Controller;
+import Model.Tutor;
+import Model.Tutorado;
 import java.util.Date;
 import java.util.List;
 
