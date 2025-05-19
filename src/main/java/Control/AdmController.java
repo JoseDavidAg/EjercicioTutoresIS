@@ -6,10 +6,10 @@ package Control;
 
 import Control.exceptions.IllegalOrphanException;
 import Control.exceptions.NonexistentEntityException;
-import Modelo.Cita;
-import Modelo.Tutor;
-import Modelo.Tutorado;
-import Modelo.Tutoria;
+import Model.Cita;
+import Model.Tutor;
+import Model.Tutorado;
+import Model.Tutoria;
 import java.util.List;
 
 /**
@@ -88,6 +88,16 @@ public class AdmController {
     public List<Tutor> traerTutores() {
        return tutorJpa.findTutorEntities();
     }
+    
+    public List<Cita> traerCitas(Integer nT){
+        return citaJpa.findCitaPorTutorEntities(nT);
+    }
+
+    public List<Tutorado> traerTutorado(Integer idTutor) {
+        return tutoradoJpa.findTutoradoEntities();
+    }
+
+    
     
     
     

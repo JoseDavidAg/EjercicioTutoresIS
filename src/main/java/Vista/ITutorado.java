@@ -4,38 +4,45 @@
  */
 package Vista;
 
-import Modelo.Controller;
-import Modelo.Tutor;
-import Modelo.Tutorado;
+import Model.Controller;
+import Model.Tutor;
+import Model.Tutorado;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ButtonModel;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
-import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import javax.swing.UIManager;
 
 /**
  *
  * @author ambro
+ * 
  */
-public class ITutorado extends javax.swing.JFrame {
-    private Controller control;
+public final class ITutorado extends javax.swing.JFrame {
+    final private Controller control;
+    
+    //Asignar tutorado 
     private Tutor tutor;
     private Tutorado tutorado;
     private List<Tutorado>tutorados;
     private List<Tutor> tutores;
-    
+
     private DefaultListModel modelEst;
     private DefaultListModel modelTutorados;
     
     private Map<String, Tutorado> tutoradoMap=new HashMap<>();
-    private final String SELECCIONA= "Selecciona tutor";
+    private final String SELECCIONA= "Selecciona un tutor";
     private final String SELECCIONADO= "Tutor seleccionado";
+    
+    //Crear tutorado
+    private Tutorado tutN;
     
     
     /**
@@ -44,14 +51,17 @@ public class ITutorado extends javax.swing.JFrame {
     public ITutorado() {
         initComponents();
         control = new Controller();
-        tutores= control.traerTutores();
-        tutorados= control.traerTutorado();
+
+        
         cargarTutores();
         cargarEstudiantes();
-        
+        cargarNoControl();
         listEst.setModel(modelEst);
-        listEst.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         listTutorados.setModel(modelTutorados);
+        
+        listEst.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        listTutorados.setSelectionMode(2);
+        
         
         btnAñadirTutorado.setEnabled(false);
     pack();
@@ -60,6 +70,7 @@ public class ITutorado extends javax.swing.JFrame {
     
     
     public void cargarTutores(){
+        tutores= control.traerTutores();
         cmbTutor.removeAllItems();
         cmbTutor.addItem("Selecciona un tutor");
         for(Tutor dTutor: tutores){
@@ -69,6 +80,7 @@ public class ITutorado extends javax.swing.JFrame {
     }
     
     public void cargarEstudiantes(){
+        tutorados= control.traerTutorado();
         modelEst= new DefaultListModel();
         modelTutorados= new DefaultListModel();
         modelEst.clear();
@@ -80,6 +92,46 @@ public class ITutorado extends javax.swing.JFrame {
             }
         }
     }
+    
+    public void cargarNoControl(){
+        String ncTutorado="";
+        List <Tutorado> tut2= control.traerTutorado();
+        if (!tut2.isEmpty()) {
+            ncTutorado = tut2.get(tut2.size() - 1).getNoControl(); // último
+        } else {
+            ncTutorado = "200000"; // valor inicial si no hay registros
+        }
+        System.out.println(ncTutorado);
+        int noControlN= Integer.parseInt(ncTutorado);
+        noControlN++;
+        
+        cmbNoControl.removeAllItems();
+        cmbNoControl.addItem(""+noControlN);
+        cmbNoControl.setSelectedIndex(0);
+        cmbNoControl.setEditable(true);
+    }
+    
+    public void repiteProceso(){
+        btnAñadirTutorado.setEnabled(false);
+        cmbTutor.setEnabled(true);
+        btnAñadir.setText(SELECCIONA);
+        btnAñadir.setEnabled(true);
+        
+        cargarTutores();
+        cargarEstudiantes();
+        
+        listEst.setModel(modelEst);
+        listTutorados.setModel(modelTutorados);
+        jCNacimiento.setDate(new Date());
+        
+    }
+    
+    public void limpiarRegistrar(){
+        txtNombre.setText("");
+        bttSexo.clearSelection();
+        cargarNoControl();
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -89,8 +141,19 @@ public class ITutorado extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bttSexo = new javax.swing.ButtonGroup();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
+        lbCarrera = new javax.swing.JLabel();
+        cmbNoControl = new javax.swing.JComboBox<>();
+        txtNombre = new javax.swing.JFormattedTextField();
+        lbNombre = new javax.swing.JLabel();
+        rbtnM = new javax.swing.JRadioButton();
+        rbtnF = new javax.swing.JRadioButton();
+        lbCarrera1 = new javax.swing.JLabel();
+        lbCarrera2 = new javax.swing.JLabel();
+        jCNacimiento = new de.wannawork.jcalendar.JCalendarComboBox();
+        btnAceptar1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         cmbTutor = new javax.swing.JComboBox<>();
         lbSeleccionaTutor = new javax.swing.JLabel();
@@ -108,15 +171,92 @@ public class ITutorado extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        lbCarrera.setText("No. Cotrol:");
+
+        txtNombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNombreActionPerformed(evt);
+            }
+        });
+
+        lbNombre.setText("Nombre completo:");
+
+        bttSexo.add(rbtnM);
+        rbtnM.setText("M");
+        rbtnM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnMActionPerformed(evt);
+            }
+        });
+
+        bttSexo.add(rbtnF);
+        rbtnF.setSelected(true);
+        rbtnF.setText("F");
+
+        lbCarrera1.setText("Genero:");
+
+        lbCarrera2.setText("Fecha Nacimiento:");
+
+        btnAceptar1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnAceptar1.setText("Aceptar");
+        btnAceptar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAceptar1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 661, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap(131, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbNombre)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lbCarrera)
+                                .addComponent(lbCarrera1)
+                                .addComponent(lbCarrera2)))
+                        .addGap(56, 56, 56)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(rbtnM, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(46, 46, 46)
+                                .addComponent(rbtnF, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(cmbNoControl, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jCNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(133, 133, 133))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(btnAceptar1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(269, 269, 269))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 498, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(99, 99, 99)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbNombre))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lbCarrera)
+                            .addComponent(cmbNoControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(32, 32, 32)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(rbtnM)
+                            .addComponent(rbtnF)
+                            .addComponent(lbCarrera1))
+                        .addGap(49, 49, 49)
+                        .addComponent(lbCarrera2))
+                    .addComponent(jCNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
+                .addComponent(btnAceptar1)
+                .addGap(105, 105, 105))
         );
 
         jTabbedPane1.addTab("Registrar tutorados", jPanel2);
@@ -271,7 +411,12 @@ public class ITutorado extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAñadirTutoradoActionPerformed
 
     private void btnQuitarTutoradoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitarTutoradoActionPerformed
-        // TODO add your handling code here:
+        int[] indEstSelect= listTutorados.getSelectedIndices();
+        for(int i= indEstSelect.length-1; i>=0; i--){
+            modelEst.addElement(modelTutorados.get(indEstSelect[i]));
+            modelTutorados.remove(indEstSelect[i]);
+        }
+        
     }//GEN-LAST:event_btnQuitarTutoradoActionPerformed
 
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
@@ -287,6 +432,8 @@ public class ITutorado extends javax.swing.JFrame {
                 }
             }
         }
+        JOptionPane.showMessageDialog(this,"Tutor asignado correctamente");
+        repiteProceso();
     }//GEN-LAST:event_btnAceptarActionPerformed
 
     private void btnAñadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAñadirActionPerformed
@@ -318,6 +465,41 @@ public class ITutorado extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnAñadirTutoradoActionPerformed2
 
+    private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNombreActionPerformed
+
+    private void rbtnMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnMActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rbtnMActionPerformed
+
+    
+    private void btnAceptar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptar1ActionPerformed
+        
+        java.util.Date utilDate = jCNacimiento.getDate();
+        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+        
+        int n= cmbNoControl.getSelectedIndex();
+        ComboBoxModel<String> model = cmbNoControl.getModel();
+          
+        tutN= new Tutorado();
+        tutN.setFecha(sqlDate);
+        tutN.setNombre(txtNombre.getText());
+        tutN.setGenero(rbtnM.isSelected()?'M':'F');
+        tutN.setNoControl((String)model.getSelectedItem());
+        
+        try {
+            control.crearTutorado(tutN);
+            JOptionPane.showMessageDialog(this,"Tutorado agregado correctamente");
+            repiteProceso();
+            limpiarRegistrar();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(ITutorado.class.getName()).log(Level.SEVERE, null, ex);}
+        
+    }//GEN-LAST:event_btnAceptar1ActionPerformed
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -343,20 +525,31 @@ public class ITutorado extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAceptar;
+    private javax.swing.JButton btnAceptar1;
     private javax.swing.JButton btnAñadir;
     private javax.swing.JButton btnAñadirTutorado;
     private javax.swing.JButton btnQuitarTutorado;
+    private javax.swing.ButtonGroup bttSexo;
+    private javax.swing.JComboBox<String> cmbNoControl;
     private javax.swing.JComboBox<String> cmbTutor;
+    private de.wannawork.jcalendar.JCalendarComboBox jCNacimiento;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lbCarrera;
+    private javax.swing.JLabel lbCarrera1;
+    private javax.swing.JLabel lbCarrera2;
+    private javax.swing.JLabel lbNombre;
     private javax.swing.JLabel lbSeleccionaTutor;
     private javax.swing.JLabel lblSelecciona;
     private javax.swing.JLabel lblSelecciona1;
     private javax.swing.JLabel lblSelecciona2;
     private javax.swing.JList<String> listEst;
     private javax.swing.JList<String> listTutorados;
+    private javax.swing.JRadioButton rbtnF;
+    private javax.swing.JRadioButton rbtnM;
+    private javax.swing.JFormattedTextField txtNombre;
     // End of variables declaration//GEN-END:variables
 }

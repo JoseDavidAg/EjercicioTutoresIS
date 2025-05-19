@@ -10,13 +10,14 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import Modelo.Tutor;
-import Modelo.Tutorado;
-import Modelo.Tutoria;
+import Model.Cita;
+import Model.Tutorado;
+import Model.Tutoria;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+
 /**
  *
  * @author ambro
@@ -26,9 +27,8 @@ public class TutoriaJpaController implements Serializable {
     public TutoriaJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    
     public TutoriaJpaController(){
-        emf= Persistence.createEntityManagerFactory("TutoresPrueba4TPU");
+        emf=Persistence.createEntityManagerFactory("TutoresPrueba4TPU");
     }
     private EntityManagerFactory emf = null;
 
@@ -41,10 +41,10 @@ public class TutoriaJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Tutor tutorId = tutoria.getTutorId();
-            if (tutorId != null) {
-                tutorId = em.getReference(tutorId.getClass(), tutorId.getIdTutor());
-                tutoria.setTutorId(tutorId);
+            Cita citaId = tutoria.getCitaId();
+            if (citaId != null) {
+                citaId = em.getReference(citaId.getClass(), citaId.getIdCita());
+                tutoria.setCitaId(citaId);
             }
             Tutorado noControl = tutoria.getNoControl();
             if (noControl != null) {
@@ -52,9 +52,9 @@ public class TutoriaJpaController implements Serializable {
                 tutoria.setNoControl(noControl);
             }
             em.persist(tutoria);
-            if (tutorId != null) {
-                tutorId.getTutoriaList().add(tutoria);
-                tutorId = em.merge(tutorId);
+            if (citaId != null) {
+                citaId.getTutoriaList().add(tutoria);
+                citaId = em.merge(citaId);
             }
             if (noControl != null) {
                 noControl.getTutoriaList().add(tutoria);
@@ -74,26 +74,26 @@ public class TutoriaJpaController implements Serializable {
             em = getEntityManager();
             em.getTransaction().begin();
             Tutoria persistentTutoria = em.find(Tutoria.class, tutoria.getIdTutoria());
-            Tutor tutorIdOld = persistentTutoria.getTutorId();
-            Tutor tutorIdNew = tutoria.getTutorId();
+            Cita citaIdOld = persistentTutoria.getCitaId();
+            Cita citaIdNew = tutoria.getCitaId();
             Tutorado noControlOld = persistentTutoria.getNoControl();
             Tutorado noControlNew = tutoria.getNoControl();
-            if (tutorIdNew != null) {
-                tutorIdNew = em.getReference(tutorIdNew.getClass(), tutorIdNew.getIdTutor());
-                tutoria.setTutorId(tutorIdNew);
+            if (citaIdNew != null) {
+                citaIdNew = em.getReference(citaIdNew.getClass(), citaIdNew.getIdCita());
+                tutoria.setCitaId(citaIdNew);
             }
             if (noControlNew != null) {
                 noControlNew = em.getReference(noControlNew.getClass(), noControlNew.getNoControl());
                 tutoria.setNoControl(noControlNew);
             }
             tutoria = em.merge(tutoria);
-            if (tutorIdOld != null && !tutorIdOld.equals(tutorIdNew)) {
-                tutorIdOld.getTutoriaList().remove(tutoria);
-                tutorIdOld = em.merge(tutorIdOld);
+            if (citaIdOld != null && !citaIdOld.equals(citaIdNew)) {
+                citaIdOld.getTutoriaList().remove(tutoria);
+                citaIdOld = em.merge(citaIdOld);
             }
-            if (tutorIdNew != null && !tutorIdNew.equals(tutorIdOld)) {
-                tutorIdNew.getTutoriaList().add(tutoria);
-                tutorIdNew = em.merge(tutorIdNew);
+            if (citaIdNew != null && !citaIdNew.equals(citaIdOld)) {
+                citaIdNew.getTutoriaList().add(tutoria);
+                citaIdNew = em.merge(citaIdNew);
             }
             if (noControlOld != null && !noControlOld.equals(noControlNew)) {
                 noControlOld.getTutoriaList().remove(tutoria);
@@ -132,10 +132,10 @@ public class TutoriaJpaController implements Serializable {
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The tutoria with id " + id + " no longer exists.", enfe);
             }
-            Tutor tutorId = tutoria.getTutorId();
-            if (tutorId != null) {
-                tutorId.getTutoriaList().remove(tutoria);
-                tutorId = em.merge(tutorId);
+            Cita citaId = tutoria.getCitaId();
+            if (citaId != null) {
+                citaId.getTutoriaList().remove(tutoria);
+                citaId = em.merge(citaId);
             }
             Tutorado noControl = tutoria.getNoControl();
             if (noControl != null) {

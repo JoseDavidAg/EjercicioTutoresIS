@@ -11,12 +11,11 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import Modelo.Tutorado;
+import Model.Tutorado;
 import java.util.ArrayList;
 import java.util.List;
-import Modelo.Cita;
-import Modelo.Tutor;
-import Modelo.Tutoria;
+import Model.Cita;
+import Model.Tutor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -47,9 +46,6 @@ public class TutorJpaController implements Serializable {
         if (tutor.getCitaList() == null) {
             tutor.setCitaList(new ArrayList<Cita>());
         }
-        if (tutor.getTutoriaList() == null) {
-            tutor.setTutoriaList(new ArrayList<Tutoria>());
-        }
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -66,12 +62,6 @@ public class TutorJpaController implements Serializable {
                 attachedCitaList.add(citaListCitaToAttach);
             }
             tutor.setCitaList(attachedCitaList);
-            List<Tutoria> attachedTutoriaList = new ArrayList<Tutoria>();
-            for (Tutoria tutoriaListTutoriaToAttach : tutor.getTutoriaList()) {
-                tutoriaListTutoriaToAttach = em.getReference(tutoriaListTutoriaToAttach.getClass(), tutoriaListTutoriaToAttach.getIdTutoria());
-                attachedTutoriaList.add(tutoriaListTutoriaToAttach);
-            }
-            tutor.setTutoriaList(attachedTutoriaList);
             em.persist(tutor);
             for (Tutorado tutoradoListTutorado : tutor.getTutoradoList()) {
                 Tutor oldTutorIdOfTutoradoListTutorado = tutoradoListTutorado.getTutorId();
@@ -89,15 +79,6 @@ public class TutorJpaController implements Serializable {
                 if (oldTutorIdOfCitaListCita != null) {
                     oldTutorIdOfCitaListCita.getCitaList().remove(citaListCita);
                     oldTutorIdOfCitaListCita = em.merge(oldTutorIdOfCitaListCita);
-                }
-            }
-            for (Tutoria tutoriaListTutoria : tutor.getTutoriaList()) {
-                Tutor oldTutorIdOfTutoriaListTutoria = tutoriaListTutoria.getTutorId();
-                tutoriaListTutoria.setTutorId(tutor);
-                tutoriaListTutoria = em.merge(tutoriaListTutoria);
-                if (oldTutorIdOfTutoriaListTutoria != null) {
-                    oldTutorIdOfTutoriaListTutoria.getTutoriaList().remove(tutoriaListTutoria);
-                    oldTutorIdOfTutoriaListTutoria = em.merge(oldTutorIdOfTutoriaListTutoria);
                 }
             }
             em.getTransaction().commit();
@@ -118,8 +99,6 @@ public class TutorJpaController implements Serializable {
             List<Tutorado> tutoradoListNew = tutor.getTutoradoList();
             List<Cita> citaListOld = persistentTutor.getCitaList();
             List<Cita> citaListNew = tutor.getCitaList();
-            List<Tutoria> tutoriaListOld = persistentTutor.getTutoriaList();
-            List<Tutoria> tutoriaListNew = tutor.getTutoriaList();
             List<String> illegalOrphanMessages = null;
             for (Cita citaListOldCita : citaListOld) {
                 if (!citaListNew.contains(citaListOldCita)) {
@@ -127,14 +106,6 @@ public class TutorJpaController implements Serializable {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
                     illegalOrphanMessages.add("You must retain Cita " + citaListOldCita + " since its tutorId field is not nullable.");
-                }
-            }
-            for (Tutoria tutoriaListOldTutoria : tutoriaListOld) {
-                if (!tutoriaListNew.contains(tutoriaListOldTutoria)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain Tutoria " + tutoriaListOldTutoria + " since its tutorId field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
@@ -154,13 +125,6 @@ public class TutorJpaController implements Serializable {
             }
             citaListNew = attachedCitaListNew;
             tutor.setCitaList(citaListNew);
-            List<Tutoria> attachedTutoriaListNew = new ArrayList<Tutoria>();
-            for (Tutoria tutoriaListNewTutoriaToAttach : tutoriaListNew) {
-                tutoriaListNewTutoriaToAttach = em.getReference(tutoriaListNewTutoriaToAttach.getClass(), tutoriaListNewTutoriaToAttach.getIdTutoria());
-                attachedTutoriaListNew.add(tutoriaListNewTutoriaToAttach);
-            }
-            tutoriaListNew = attachedTutoriaListNew;
-            tutor.setTutoriaList(tutoriaListNew);
             tutor = em.merge(tutor);
             for (Tutorado tutoradoListOldTutorado : tutoradoListOld) {
                 if (!tutoradoListNew.contains(tutoradoListOldTutorado)) {
@@ -187,17 +151,6 @@ public class TutorJpaController implements Serializable {
                     if (oldTutorIdOfCitaListNewCita != null && !oldTutorIdOfCitaListNewCita.equals(tutor)) {
                         oldTutorIdOfCitaListNewCita.getCitaList().remove(citaListNewCita);
                         oldTutorIdOfCitaListNewCita = em.merge(oldTutorIdOfCitaListNewCita);
-                    }
-                }
-            }
-            for (Tutoria tutoriaListNewTutoria : tutoriaListNew) {
-                if (!tutoriaListOld.contains(tutoriaListNewTutoria)) {
-                    Tutor oldTutorIdOfTutoriaListNewTutoria = tutoriaListNewTutoria.getTutorId();
-                    tutoriaListNewTutoria.setTutorId(tutor);
-                    tutoriaListNewTutoria = em.merge(tutoriaListNewTutoria);
-                    if (oldTutorIdOfTutoriaListNewTutoria != null && !oldTutorIdOfTutoriaListNewTutoria.equals(tutor)) {
-                        oldTutorIdOfTutoriaListNewTutoria.getTutoriaList().remove(tutoriaListNewTutoria);
-                        oldTutorIdOfTutoriaListNewTutoria = em.merge(oldTutorIdOfTutoriaListNewTutoria);
                     }
                 }
             }
@@ -237,13 +190,6 @@ public class TutorJpaController implements Serializable {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
                 illegalOrphanMessages.add("This Tutor (" + tutor + ") cannot be destroyed since the Cita " + citaListOrphanCheckCita + " in its citaList field has a non-nullable tutorId field.");
-            }
-            List<Tutoria> tutoriaListOrphanCheck = tutor.getTutoriaList();
-            for (Tutoria tutoriaListOrphanCheckTutoria : tutoriaListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This Tutor (" + tutor + ") cannot be destroyed since the Tutoria " + tutoriaListOrphanCheckTutoria + " in its tutoriaList field has a non-nullable tutorId field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);

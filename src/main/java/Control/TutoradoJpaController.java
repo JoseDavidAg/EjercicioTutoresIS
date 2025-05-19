@@ -12,15 +12,17 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import Modelo.Tutor;
-import Modelo.Cita;
-import Modelo.Tutorado;
+import Model.Tutor;
+import Model.Cita;
+import Model.Tutorado;
 import java.util.ArrayList;
 import java.util.List;
-import Modelo.Tutoria;
+import Model.Tutoria;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
+
 /**
  *
  * @author ambro
@@ -34,6 +36,7 @@ public class TutoradoJpaController implements Serializable {
     public TutoradoJpaController(){
         emf= Persistence.createEntityManagerFactory("TutoresPrueba4TPU");
     }
+    
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
@@ -249,7 +252,28 @@ public class TutoradoJpaController implements Serializable {
     public List<Tutorado> findTutoradoEntities() {
         return findTutoradoEntities(true, -1, -1);
     }
+    
+    public List<Tutorado> findTutoradoEntities(Integer tutorId) {
+        EntityManager em = getEntityManager();
+        List<Tutorado> citas = new ArrayList<>();
 
+        try {
+            TypedQuery<Tutorado> query = em.createQuery(
+                "SELECT c FROM Tutorado c WHERE c.tutorId.idTutor = :tutorId ",
+                Tutorado.class
+            );
+            query.setParameter("tutorId", tutorId);
+            citas = query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+
+        return citas;
+    }
+    
+    
     public List<Tutorado> findTutoradoEntities(int maxResults, int firstResult) {
         return findTutoradoEntities(false, maxResults, firstResult);
     }

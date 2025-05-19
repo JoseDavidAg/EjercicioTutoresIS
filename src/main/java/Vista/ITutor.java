@@ -4,10 +4,10 @@
  */
 package Vista;
 
-import Modelo.MTtutor;
-import Modelo.Controller;
-import Modelo.Tutor;
-import Modelo.Tutorado;
+import Model.MTtutor;
+import Model.Controller;
+import Model.Tutor;
+import Model.Tutorado;
 import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;

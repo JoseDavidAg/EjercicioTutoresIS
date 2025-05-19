@@ -5,18 +5,23 @@
 package Control;
 
 import Control.exceptions.NonexistentEntityException;
-import Modelo.Cita;
+import Model.Cita;
+import Model.DatosTablaCitas;
 import java.io.Serializable;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import Modelo.Tutor;
-import Modelo.Tutorado;
+import Model.Tutor;
+import Model.Tutorado;
+import Model.Tutoria;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 
 /**
  *
@@ -27,8 +32,9 @@ public class CitaJpaController implements Serializable {
     public CitaJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
+    
     public CitaJpaController(){
-        emf= Persistence.createEntityManagerFactory("TutoresPrueba4TPU");
+        emf=Persistence.createEntityManagerFactory("TutoresPrueba4TPU");
     }
     private EntityManagerFactory emf = null;
 
@@ -37,6 +43,9 @@ public class CitaJpaController implements Serializable {
     }
 
     public void create(Cita cita) {
+        if (cita.getTutoriaList() == null) {
+            cita.setTutoriaList(new ArrayList<Tutoria>());
+        }
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -51,6 +60,12 @@ public class CitaJpaController implements Serializable {
                 noControl = em.getReference(noControl.getClass(), noControl.getNoControl());
                 cita.setNoControl(noControl);
             }
+            List<Tutoria> attachedTutoriaList = new ArrayList<Tutoria>();
+            for (Tutoria tutoriaListTutoriaToAttach : cita.getTutoriaList()) {
+                tutoriaListTutoriaToAttach = em.getReference(tutoriaListTutoriaToAttach.getClass(), tutoriaListTutoriaToAttach.getIdTutoria());
+                attachedTutoriaList.add(tutoriaListTutoriaToAttach);
+            }
+            cita.setTutoriaList(attachedTutoriaList);
             em.persist(cita);
             if (tutorId != null) {
                 tutorId.getCitaList().add(cita);
@@ -59,6 +74,15 @@ public class CitaJpaController implements Serializable {
             if (noControl != null) {
                 noControl.getCitaList().add(cita);
                 noControl = em.merge(noControl);
+            }
+            for (Tutoria tutoriaListTutoria : cita.getTutoriaList()) {
+                Cita oldCitaIdOfTutoriaListTutoria = tutoriaListTutoria.getCitaId();
+                tutoriaListTutoria.setCitaId(cita);
+                tutoriaListTutoria = em.merge(tutoriaListTutoria);
+                if (oldCitaIdOfTutoriaListTutoria != null) {
+                    oldCitaIdOfTutoriaListTutoria.getTutoriaList().remove(tutoriaListTutoria);
+                    oldCitaIdOfTutoriaListTutoria = em.merge(oldCitaIdOfTutoriaListTutoria);
+                }
             }
             em.getTransaction().commit();
         } finally {
@@ -78,6 +102,8 @@ public class CitaJpaController implements Serializable {
             Tutor tutorIdNew = cita.getTutorId();
             Tutorado noControlOld = persistentCita.getNoControl();
             Tutorado noControlNew = cita.getNoControl();
+            List<Tutoria> tutoriaListOld = persistentCita.getTutoriaList();
+            List<Tutoria> tutoriaListNew = cita.getTutoriaList();
             if (tutorIdNew != null) {
                 tutorIdNew = em.getReference(tutorIdNew.getClass(), tutorIdNew.getIdTutor());
                 cita.setTutorId(tutorIdNew);
@@ -86,6 +112,13 @@ public class CitaJpaController implements Serializable {
                 noControlNew = em.getReference(noControlNew.getClass(), noControlNew.getNoControl());
                 cita.setNoControl(noControlNew);
             }
+            List<Tutoria> attachedTutoriaListNew = new ArrayList<Tutoria>();
+            for (Tutoria tutoriaListNewTutoriaToAttach : tutoriaListNew) {
+                tutoriaListNewTutoriaToAttach = em.getReference(tutoriaListNewTutoriaToAttach.getClass(), tutoriaListNewTutoriaToAttach.getIdTutoria());
+                attachedTutoriaListNew.add(tutoriaListNewTutoriaToAttach);
+            }
+            tutoriaListNew = attachedTutoriaListNew;
+            cita.setTutoriaList(tutoriaListNew);
             cita = em.merge(cita);
             if (tutorIdOld != null && !tutorIdOld.equals(tutorIdNew)) {
                 tutorIdOld.getCitaList().remove(cita);
@@ -102,6 +135,23 @@ public class CitaJpaController implements Serializable {
             if (noControlNew != null && !noControlNew.equals(noControlOld)) {
                 noControlNew.getCitaList().add(cita);
                 noControlNew = em.merge(noControlNew);
+            }
+            for (Tutoria tutoriaListOldTutoria : tutoriaListOld) {
+                if (!tutoriaListNew.contains(tutoriaListOldTutoria)) {
+                    tutoriaListOldTutoria.setCitaId(null);
+                    tutoriaListOldTutoria = em.merge(tutoriaListOldTutoria);
+                }
+            }
+            for (Tutoria tutoriaListNewTutoria : tutoriaListNew) {
+                if (!tutoriaListOld.contains(tutoriaListNewTutoria)) {
+                    Cita oldCitaIdOfTutoriaListNewTutoria = tutoriaListNewTutoria.getCitaId();
+                    tutoriaListNewTutoria.setCitaId(cita);
+                    tutoriaListNewTutoria = em.merge(tutoriaListNewTutoria);
+                    if (oldCitaIdOfTutoriaListNewTutoria != null && !oldCitaIdOfTutoriaListNewTutoria.equals(cita)) {
+                        oldCitaIdOfTutoriaListNewTutoria.getTutoriaList().remove(tutoriaListNewTutoria);
+                        oldCitaIdOfTutoriaListNewTutoria = em.merge(oldCitaIdOfTutoriaListNewTutoria);
+                    }
+                }
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -141,6 +191,11 @@ public class CitaJpaController implements Serializable {
             if (noControl != null) {
                 noControl.getCitaList().remove(cita);
                 noControl = em.merge(noControl);
+            }
+            List<Tutoria> tutoriaList = cita.getTutoriaList();
+            for (Tutoria tutoriaListTutoria : tutoriaList) {
+                tutoriaListTutoria.setCitaId(null);
+                tutoriaListTutoria = em.merge(tutoriaListTutoria);
             }
             em.remove(cita);
             em.getTransaction().commit();
@@ -183,6 +238,30 @@ public class CitaJpaController implements Serializable {
             em.close();
         }
     }
+                      
+    public List<Cita> findCitaPorTutorEntities(Integer tutorId) {
+        EntityManager em = getEntityManager();
+        List<Cita> citas = new ArrayList<>();
+
+        try {
+            TypedQuery<Cita> query = em.createQuery(
+                "SELECT c FROM Cita c WHERE c.tutorId.idTutor = :tutorId ",
+                Cita.class
+            );
+            query.setParameter("tutorId", tutorId);
+            citas = query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+
+        return citas;
+    }
+    
+    
+
+
 
     public int getCitaCount() {
         EntityManager em = getEntityManager();
